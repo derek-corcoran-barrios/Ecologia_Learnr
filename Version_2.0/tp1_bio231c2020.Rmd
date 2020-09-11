@@ -1,5 +1,5 @@
 ---
-title: "Ecologia \n BIO231C_2018"
+title: "Ecologia \n BIO231C_2020"
 author: "Simon P. Castillo - spcastil@uc.cl"
 output: 
   learnr::tutorial:
@@ -48,7 +48,7 @@ list(dy)
 ## Módulos practicos Ecología BIO231C-2018
 **>Curso**: Ecología Bio231c <br>
 **>Profesor**: Pablo Marquet <br>
-**>Jefe de ayudantes**: Simón Castillo (spcastil@uc.cl) <br>
+**>Jefe de ayudantes**: Bárbara Seamann (b.seaman.e@gmail.com) <br>
 
 <h2 style="color:black;">Preámbulo</h2>
 <h3 style="color:blue;"> Contenidos</h3>
@@ -59,9 +59,6 @@ list(dy)
 1.1 Breve introducción a R y R-studio<br>
 1.1.1 Lenguaje básico I: operaciones, objetos, vectores, y listas <br>
 1.1.2 Lenguaje básico II: Loops y funciones básicas <br> 
-1.2 Nociones de dinámicas poblacionales: modelos a tiempo continuo y a tiempo discreto<br>
-1.2.1 Modelo de crecimiento exponencial<br>
-1.2.2 Modelo de crecimiento logístico<br>
 
 
  **Literatura de consulta**<br>
@@ -71,10 +68,6 @@ list(dy)
 
 ---
 
-<h3 style="color:blue;"> Evaluaciones</h2>
-
-**Controles (n=2)** 0.1NF <br>
-**Takehome test** 0.15NF
 
 ## Módulo 1.1.1: Lenguaje básico I
 
@@ -310,195 +303,4 @@ binario_1
 
 #Ahora ejecutamos la función y vemos el output
 switch(binario_1)
-```
-<h3 style="color:green;">***<br>Ejercicio bonus</h3>
-
-Imagina una población  de $N=$ 15 individuos, cada uno de los cuales puede estar sólo en un estado del espacio de estados posibles $\omega_i \in \Omega = \{0,1\}$. Dado el vector _initialState _ que define los estados iniciales en una población:<br>
-
-initialState<-c(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0)<br>
-
-Podemos definir el estado de un individuo $i$ en un tiempo $(t)$ como $\omega_i(t)$. Nota que en este caso en subíndice $i$ indica la posición del individuo en el vector. <br>
-**Misión:** Crea una función llamada "spread" con dos argumentos: el vector inicial 'x' y un argumento asociado al número de generaciones a correr, la cual a cada paso temporal _seleccione aleatoriamente uno de los 15 individuos en el vector inicial_ (excepto los de los extremos), y que cambie el estado de este individuo $\omega_i(t) \rightarrow \omega_i(t+1)$ de acuerdo a las siguientes reglas:<br>
-
-*  Si $\omega_i(t) = 0$ y $\omega_{i-1}(t) = 1$ o $\omega_{i+1}(t) = 1$, entonces  $\omega_i(t+1) = 1$
-
-*  Si $\omega_i(t) = 0$ y $\omega_{i-1}(t) = \omega_{i+1}(t) = 0$, entonces  $\omega_i(t+1) = 0$ 
-
-*  Si $\omega_i(t) = 1$ y $\omega_{i-1}(t) = \omega_{i+1}(t) = 0$, entonces  $\omega_i(t+1) = 1$ 
-
-*  Si $\omega_i(t) = 1$ y $\omega_{i-1}(t) = 1$ o $\omega_{i+1}(t) = 1$, entonces  $\omega_i(t+1) = 0$
-
-
-<span style="background-color: cyan">Si lo logras, envía tu código dentro de las próximas 24hrs a spcastil@uc.cl y si está correcto obtendrás 0.5 puntos en el control!! (sólo para el primer estudiante que tenga el código correcto). May the force be w u ;-)</span>
-
- <h3 style="color:green;">***</h3>
-
-## Módulo 1.2.1: Modelo exponencial
-
-En este módulo repasaremos y analizaremos conceptos centrales en el ámbito de la ecología de poblaciones, principalmente los principios de crecimiento exponencial (denso-independiente) y crecimiento logístico (denso-dependiente), así cómo las aproximaciones matemáticas (ecuaciones diferenciales y de diferencia) y sus implicancias biológicas. <br>
-
-En términos funcionales, de acuerdo a [Berryman (2002)](https://onlinelibrary.wiley.com/doi/pdf/10.1034/j.1600-0706.2002.970314.x) una población queda definida como:<br><br>
-_“a group of individuals of the same species that live together
-in an area of sufficient size to permit normal dispersal and/or
-migration behavior and in which numerical changes are largely
-determined by birth and death processes."_ <br><br>
-Por consiguente, la dinámica de poblaciones se centra en responder y generar preguntas relacionadas a los **cambios en el número de individuos** que experimenta una población.<br>
-
-###Modelo de crecimiento exponencial
-
-Siendo el modelo más sencillo de crecimiento poblacional, este modelo sólo cuenta con un parámetro que refleja la denso-independencia en el crecimiento de una población. La ecuación de diferencia corresponde a 
-$$\frac{\Delta N}{\Delta t}=\lambda$$ 
-tal que _N(t)_ corresponde al tamaño poblacional para un tiempo determinado, que depende solo del tamaño poblacional en el tiempo anterior _N(t-1)_ y la tasa de crecimiento $\lambda$. De forma análoga, la ecuación diferencial de este caso, corresponde a $$\frac{dN}{dt}=rN$$ En este módulo, nos ocuparemos de la primera aproximación, para ver la evolución de una población en el tiempo bajo este principio poblacional. <br>
-
-Antes de comenzar con la programación de este tipo de trayectorias poblacionales, analicemos de forma análitica la ecuación, busquemos sus puntos de equilibrio y su solución. <br>
-
-## 
-Ahora, veamos cómo podemos programarla y simular un comportamiento exponencial de una población.
-
-```{r 12, exercise=T, exercise.lines=22}
-# Inicialmente definiremos los parámetros fijos del modelo
-
-  N <- 10 # tamaño poblacional inicial
-  lambda <- 0.1 # tasa de crecimiento
-  nsteps <- 100 # numero de time steps a simular
-
-
-# Luego calculamos el cambio de la abundancia en el 'tiempo'. 
-# Notar que el tiempo avanza de forma discreta, saltos de una unidad temporal
-
-  for(t in 2:nsteps){
- 
-    N[t] <- N[t-1] + N[t-1] * lambda
-    # N[t] = abundancia en el tiempo actual
-    # N[t-1] = abundancia en el tiempo anterior
-  }
-
-#A continuacion graficaremos los resultados
-plot(`N`, bty="n", las=1, type="l", lwd= 2,ylim=c(0, max(N)),
-       xlab="Tiempo", ylab="Tamaño Poblacional", main="Crecimiento Exponencial", col="blue")
-```
-
-
-<h3 style="color:green;"> ./?</h3>
-
-**Respecto a lo que sabemos hasta el momento, responde a las siguientes preguntas.**
-```{r quiz2, echo=FALSE}
-quiz(
-  question("¿Cuál(es) de los siguientes supuestos subyace(n) al modelo de crecimiento exponencial?",
-    answer("Tasas de mortalidad y natalidad dependen del tamaño poblacional"),
-    answer("Recursos ilimitados", correct = TRUE),
-    answer("No existe autoregulacion poblacional", correct = TRUE),
-    answer("Todos los individuos en una poblacion tienen igual probabilidad de morir", correct = T),
-    correct= "Bien, Malthus estaria orgulloso !",
-    incorrect = "Recuerda lo visto en clases e inténtalo otra vez ;)"
-  ), 
- question("El modelo de crecimiento exponencial que hemos visto, es un modelo:",
-    answer("Denso-dependiente-espacialmente explícito"),
-    answer("Denso-independiente-espacialmente explícito"),
-    answer("Denso-dependiente-no es espacialmente explícito"),
-    answer("Denso-independiente-no es espacialmente explícito", correct = TRUE),
-    allow_retry = T,
-    correct= "Excelente !",
-    incorrect = "meh, no le diste. intentalo otra vez ;)"
-  )
-  
-)
-```
-
-## Módulo 1.2.2: Modelo logístico
-
-Este segundo modelo refleja el fenómeno de denso-dependencia en el crecimiento de una población (mecanismos de feedback o retroalimentación poblacional). En este caso abordaremos la aproximación en tiempo continuo y consideraremos que nuestra variable de interés es biomasa (una variable continua, diferenciable en el tiempo), siendo el modelo $$\frac{dN}{dt}=rN\times \Big(1 - \dfrac{N}{K}\Big)$$. Donde $r$ es la tasa per capita de crecimiento poblacional y $K$ es la capacidad de carga del sistema. Si buscamos las soluciones en el equilibrio (i.e., cuando $\dot{N}=0$) encontramos dos soluciones: la solución trivial $$\hat{N} = 0$$ y otra solución tal que $$\hat{N} = K$$.<br>
-
-¿ Cómo llegamos a estos resultados analíticos?
-##
-A continuación estudiaremos si esta aproximación analítica se corresponde con lo que podemos obtener a través de la simulación [determinista](https://es.wikipedia.org/wiki/Sistema_determinista) de una población.<br> Para ello utilizaremos dos paquetes de funciones nuevos, si estos no estan instalados en el computador que utilizas, corra el siguiente código en la consola de Rstudio: `install_packages(c("deSolve", "deTestSet"))`
-
-
-``` {r 14, exercise=T, exercise.lines=24}
-#Al igual que en el caso anterior, comenzaremos por definir la variables fijas 
-#(tambien llamadas 'globals')
-# Definimos los parámetros de crecimiento (fijos)
-r <- 0.4 ; K <- 10
-
-#Ademas necesitamos entregarle un vector inicial de poblacion (N0)
-N0 <- c(N = 2)
-
-#Definimos el intervalo de tiempo
-time <- seq(from = 0, to = 30, by = 0.2)
-
-#Creamos la funcion que describe el crecimiento logistico
-LogisticGrowth <- function(t, N, parameters){
-  r <- parameters[1]
-  K <- parameters[2]
-  dN <- r*N*(1 - N/K)
-  list(dN)
-}
-
-
-#Creamos una realizacion para determinada condicion inicial dada
-out_1 <- ode(y = N0, times = time, func = LogisticGrowth,
-           parms = c(r,K))
-
-#Graficamos el resultado
-plot(out_1, bty="n",main = "Crecimiento Logístico", lwd = 2, xlab = "Tiempo", ylab = "Densidad poblacional", col="blue")
-
-logistic.phasePortrait <- phasePortrait(logistic, y.lim = c(-0.5, max(out_1)), lwd = 2,
-                                        parameters = c(r,K), points = 10, col="purple", xlab="Tiempo", ylab="Función R")
-
-```
-
-```{r 15, exercise=T, exercise.lines=24}
-#Tambien podemos crear otras instancias para comparar con el caso anterior.
-#Por ejemplo cambiando la tasa de crecimiento
-##Caso A:
-N0 <- c(N = 2)
-r <- 0.5  ; K <- 10
-time <- seq(from = 0, to = 50, by = 0.2)
-
-out_2 <- deSolve::ode(y = N0, times = time, func = LogisticGrowth,
-           parms = c(r,K))
-
-##Caso B:
-N0 <- c(N = 2)
-r <- 0.25 ; K <- 10
-
-out_3 <- ode(y = N0, times = time, func = LogisticGrowth,
-           parms = c(r,K))
-
-#Y graficamos los resultados con el resultado anterior
-plot(out_2,out_3, bty="n",main = "Crecimiento Logístico", 
-     lwd = 2, xlab = "Tiempo", ylab = "Tamaño poblacional",col = c("green", "blue"))
-legend("bottomright",inset=0.05, c("Caso A", "Caso B"),cex=0.8, lty = c(1,2), col = c("green", "blue"))
-
-```
-
-<h3 style="color:green;">Quick coding task</h3>
-¿Qué crees que pasará si el tamaño poblacional inicial es mayor a la capacidad de carga? Evalúa el caso y grafica los resultados. Discute con respecto a si la capacidad de carga es un [atractor](https://en.wikipedia.org/wiki/Attractor) o un repulsor demográfico (**hint:**puntos de equilibrios estables/inestables).
-
-
-<h3 style="color:green;"> ./?</h3>
-
-**Respecto a lo que sabemos hasta el momento, responde a las siguientes preguntas.**
-
-```{r quiz3, echo=FALSE}
-quiz(
-  question("¿Cuál(es) de los siguientes supuestos subyace(n) al modelo de crecimiento logistico?",
-    answer("Es un modelo con denso-dependencia negativa", correct=T),
-    answer("Cambio instantaneo en $r$, dados cambios en $N(t)$", correct = F),
-    answer("Existen recursos limitados", correct = TRUE),
-    answer("$r_{max}$ y $K$ con constantes en el tiempo", correct = TRUE),
-    correct= "Muy bien !",
-    incorrect = "No le diste. Inténtalo otra vez ;)"
-  ), 
- question("El modelo de crecimiento logistico  que hemos visto es un modelo",
-    answer("Denso-dependiente-espacialmente explícito"),
-    answer("Denso-independiente-espacialmente explícito"),
-    answer("Denso-dependiente-no es espacialmente explícito", correct = TRUE),
-    answer("Denso-independiente-no es espacialmente explícito"),
-    allow_retry = T,
-    correct= "Excelente !",
-    incorrect = "No le diste. Inténtalo otra vez ;)"
-  )
-  
-)
 ```
