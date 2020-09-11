@@ -1,0 +1,504 @@
+---
+title: "Ecologia \n BIO231C_2018"
+author: "Simon P. Castillo - spcastil@uc.cl"
+output: 
+  learnr::tutorial:
+    progressive: true
+    
+runtime: shiny_prerendered
+---
+```{r setup, include=F}
+checkerb <- function(label, user_code, check_code, envir_result, evaluate_result, ...) { 
+  # user_code=exercise$code
+ # if (user_code == check_code){
+  if (eval(parse(text=stringr::str_trim(gsub(" ","", user_code)))) == eval(parse(text=stringr::str_trim(gsub(" ","",check_code))))){
+    return(list(message = "Excelente! :D", correct = TRUE, location = "append"))}
+  else {return(list(message = paste0("Nope, sigue intentándolo!"), correct = FALSE, location = "append"))
+    }
+}
+
+library(learnr)
+tutorial_options(exercise.checker = checkerb)
+
+LogisticGrowth <- function(t, N, parameters){
+  r <- parameters[1]
+  K <- parameters[2]
+  dN <- r*N*(1 - N/K)
+  list(dN)
+}
+
+lotkaVolterra <-function(t, y, parameters) {
+x <- y[1]
+y <- y[2]
+alpha <- parameters[1]
+beta <- parameters[2]
+gamma <- parameters[3]
+delta <- parameters[4]
+dy <- numeric(2)
+dy[1] <- alpha*x - beta*x*y
+dy[2] <- gamma*x*y - delta*y
+list(dy)
+}
+
+```
+
+
+
+
+## Módulos practicos Ecología BIO231C-2018
+**>Curso**: Ecología Bio231c <br>
+**>Profesor**: Pablo Marquet <br>
+**>Jefe de ayudantes**: Simón Castillo (spcastil@uc.cl) <br>
+
+<h2 style="color:black;">Preámbulo</h2>
+<h3 style="color:blue;"> Contenidos</h3>
+---
+
+**Trabajo práctico #1 Introducción a R y Principios de dinámicas poblacionales** <br>
+
+1.1 Breve introducción a R y R-studio<br>
+1.1.1 Lenguaje básico I: operaciones, objetos, vectores, y listas <br>
+1.1.2 Lenguaje básico II: Loops y funciones básicas <br> 
+1.2 Nociones de dinámicas poblacionales: modelos a tiempo continuo y a tiempo discreto<br>
+1.2.1 Modelo de crecimiento exponencial<br>
+1.2.2 Modelo de crecimiento logístico<br>
+
+
+ **Literatura de consulta**<br>
+[Van der Meer y Goldberg (2013) Population Ecology: First principles](https://press.princeton.edu/titles/10164.html). <br>
+[Neuhauser (2014) Calculus for biology and medicine](https://www.amazon.com/Calculus-Biology-Medicine-Life-Sciences/dp/0321644689).
+
+
+---
+
+<h3 style="color:blue;"> Evaluaciones</h2>
+
+**Controles (n=2)** 0.1NF <br>
+**Takehome test** 0.15NF
+
+## Módulo 1.1.1: Lenguaje básico I
+
+
+Como una aproximación que facilite el entendimiento de algunos principios que describen las fluctuaciones demográficas, en estas sesiones indagaremos superficialmente en una herramienta que permite el modelamiento y la simulación de datos poblacionales (entre otros variados usos) que está siendo ampliamente utilizada dada su estructura de [código abierto](https://es.wikipedia.org/wiki/C%C3%B3digo_abierto). Esta herramienta es [R](https://www.r-project.org/) y la utilizaremos a través del IDE [Rstudio](https://es.wikipedia.org/wiki/RStudio). <br>
+
+
+En este módulo aprenderemos aspectos básicos y esenciales para comunicarnos con el PC a través de R/Rstudio. Algunas características generales de [R](https://www.r-project.org/) nos permiten desde realizar cálculos sencillos hasta resolver ecuaciones diferenciales ordinarias (ODE). Comenzaremos con los usos más sencillos.
+
+**R como una calculadora<br>**
+
+   R puede ejecutar todas las operaciones matemáticas, por ejemplo: `+`, `-`, `*`, `sqrt()`, `exp()`, `abs()`, etc. Basta que le digamos a R de una forma clara que operación queremos realizar. <br>En la siguiente casilla escribe el código necesario para calcular la suma de las raíces cuadradas de 144 y 64 <br>
+```{r 1, exercise=TRUE, echo=FALSE, eval=TRUE}
+
+```
+
+```{r 1-hint}
+La función `sqrt()` entrega la raíz cuadrada de un número.
+```
+
+```{r 1-check, echo=FALSE, eval=TRUE}
+sqrt(144)+sqrt(64)
+```
+
+
+**R utiliza lenguaje lógico<br>**
+
+R puede realizar tests con operadores lógicos, tales como: `<`, `>`, `==`, `!=`, etc. Tales operaciones nos permiten comparar de forma cualitativa dos o más elementos (numéricos o carácteres). Como resultado de la comparación ejecutada, obtenemos un elemento con resultados `TRUE` o `FALSE` de acuerdo a si la comparación elemento-a-elemento es verdadera o falsa, respectivamente.<br>
+Por ejemplo, a continuación evalúa si 5 es igual a 3:
+
+```{r 2, exercise=TRUE }
+
+```
+
+```{r 2-hint}
+ `==` evalua si dos números, expresiones u objetos son iguales
+```
+```{r 2-code-check}
+
+```
+```{r 2-check}
+5 == 3
+```
+
+**R utiliza objetos <br>**
+Para generar memoria en R, y no estar creado los mismos elemntos cada vez que los necesitamos, crearemos `objetos`, los cuales son paquetes de información, que alberga la sesión de R en su memoria.
+Podemos crear objetos simplemente utlizando el operador `<-` o bien `=`. Estos objetos pueden ser del tipo numérico, enteros, caracteres, complejos, etc.
+```{r 3, exercise=TRUE, exercise.lines = 7}
+# Creamos el objeto llamado 'a' cuyo valor es 435
+a <- 435
+#A partir de esto, cada vez que pongamos 'a' en el código (sin comillas)
+#R entendera que nos referimos al número 435
+a
+a + 111
+```
+A continuación crea un objeto llamado `b` que sea el promedio de `a` y 300, e imprime (o llama) el valor del objeto `b`.
+```{r tt, exercise=TRUE}
+a <- 435
+```
+
+```{r tt-hint}
+Para calcular promedios utiliza la función `mean()`
+```
+```{r tt-code-check}
+
+```
+```{r tt-check}
+a<- 435
+b<-mean(a,300)
+b
+```
+
+
+Un tipo de objeto que utilizaremos muy a menudo en R, son los **vectores**, que son objetos unidimensionales con un número definido (pero no necesariamente fijo en el tiempo) de elementos.<br>
+Para crear un **vector numérico** podemos utilizar las funciones `c()`, `seq()`, o simplemente el operador `:`.
+   
+``` {r 4, exercise=TRUE, exercise.lines = 7}
+vector_1  <- c(1,2,3,4,5,6,7) #En este sentido c() es decirle a R que haga una colección de objetos
+vector_1b <- 1:7 #El operador : resulta en un vector de números enteros entre  min:max
+vector_1c <- seq(1,7,1) #La funcion seq(min=, max=, by=)
+
+#Llamamos a los vectores generados para visualizarlos
+vector_1
+vector_1b
+vector_1c
+```
+
+Cada elemento del vector creado, independiente del tipo de vector, tiene una posición dentro del vector, que va desde la posición 1 al tamaño del vector (esto varía entre lenguajes de programación). Para todos los casos, en R podemos saber la longitud de un vector utilizando la función `length()`. Y para conocer el elemento que está en la posición 'x' del vector utilizamos nombrevector[x]. Notar que `[]` es para indicar la posición  en una dimensión.<br> De esta forma para el vector creado anteriormente (`vector_1`):
+
+``` {r 5, exercise=TRUE, exercise.lines = 3}
+vector_1  <- c(1,2,3,4,5,6,7) #En este sentido c() es decirle a R que haga una colección de objetos
+length(vector_1)
+vector_1[3] # Con esto buscamos el valor que está en la posición 3 en el objeto vector_1
+``` 
+
+Una nota al margen es necesaria, por cuanto para vectores con caracteres sólo podemos crearlos utilizando las funciones `c()`,`paste()`, o `paste0()`. Por lo tanto, la función `seq(mínimo, máximo, delta)` y el operador  `mínimo : máximo`, *sólo* aplica a vectores numéricos.
+
+``` {r 6, exercise=TRUE, exercise.lines = 8}
+vector_2<-c("Tyron", "Pickle Rick", "Elfo")
+vector_2
+#Para extraer el valor en la posición determinada ocupamos []
+vector_2[3]
+#Notar que este valor extraído lo podemos asignar a un nuevo objeto
+iamelfo<-vector_2[3]
+
+```
+``` {r elfo, exercise=TRUE, exercise.lines = 8}
+vector_2<-c("Tyron", "Pickle Rick", "Elfo")
+#Notar que este valor extraído lo podemos asignar a un nuevo objeto
+iamelfo<-vector_2[3]
+ #Y luego llamar a ese objeto, y por ejemplo ejecutar una operación lógica
+iamelfo == vector_2[1]
+iamelfo == "elfo"
+```
+
+<h3 style="color:green;">./?</h3>
+a). ¿Cómo podrías combinar vectores? Importa si son de distinto tipo (e.g., numéricos con caracteres)? <br>
+b). ¿Puedes realizar operaciones entre vectores de distinto tipo o sobre un vector "mixto"?<br>
+
+Si necesitas crear un objeto con distintos vectores guardados de forma independiente puedes crear una **lista**, indexando en cada sección de esta lista, vectores distintos. Para indexar listas utilizaremos doble bracket `[[y]]` donde _y_ corresponde a la subsección. Por ejemplo, creemos una lista un poco más compleja:
+
+```{r 7, exercise=T, exercise.lines=2}
+lista_1 <- list(seq(1:15), 3:6, "van Leeuwenhoek", "von Humboldt", c("Darwin", "Wallace"))
+```
+
+<h3 style="color:green;">./?</h3>
+```{r letter-a, echo=FALSE}
+question("a). ¿Cuál es la longitud de la lista_1? i.e., cuántas secciones tiene??",
+  answer("6"),
+  answer("23"),
+  answer("5", correct = TRUE),
+  answer("7"),
+  incorrect ="Caaaasi, pero no. :| ... Inténtalo otra vez.",
+  correct= "Enhorabuena !! :D",
+  allow_retry = TRUE
+)
+```
+b). ¿Cómo crearías una expresión a partir de esta `lista_1`, que extraiga el nombre de Darwin en función de su localización? Inténtalo acá:
+
+```{r 8, exercise=TRUE, exercise.lines=3}
+lista_1 <- list(seq(1:15), 3:6, "van Leeuwenhoek", "von Humboldt", c("Darwin", "Wallace"))
+
+```
+
+```{r 8-hint}
+Darwin es parte de una lista, pero también de un vector anidado en esa lista. Por lo que deberías indexar dos veces: `[[]]` para sección de la lista; y `[]` para posición en el vector.
+```
+
+```{r 8-code-check}
+
+```
+```{r 8-check}
+lista_1 <- list(seq(1:15), 3:6, "van Leeuwenhoek", "von Humboldt", c("Darwin", "Wallace"))
+lista_1[[5]][1]
+```
+
+<h3 style="color:green;">***<br>Ejercicios</h3>
+
+**1. Operaciones matemáticas básicas**<br>
+    1.1 Calcula la suma de 133 + 515 <br>
+    1.2 Calcula el promedio de 578, 11, 100, 0.17<br>
+    
+
+**2. Vectores**<br>
+    2.1 Crea un vector de 1 a 100 con incrementos de 0.01. Guardalo como objeto 'x'. Calcula la media, varianza y longitud de 'x'.<br>
+    2.2 Crea un vector con los siguientes nombres: Hegel, Marx, Engels, Butler, Spinoza. Guárdalo como un objeto llamado 'y'.<br>
+    2.3 Combina x e y en un solo objeto, ¿cuál es la longitud del nuevo objeto?<br>
+    2.4 Crea un vector desde 144 a 12 con decrementos de 2. Cuál es el número en la posición 12 de este vector?<br>
+    2.5 A partir del vector anterior, crea un nuevo vector con los valores en la posicion 10 y 20.<br>
+    
+
+**3. Listas**<br>
+    3.1 Crea una lista con los siguientes elementos: (1) tu nombre, (2) edad, (3) tus tres peliculas favoritas, (4) último libro que leíste y (5) tu carrera.<br>
+    3.2 ¿Cómo podrías obtener el nombre de la segunda película?        
+    3.3 ¿Cómo podrías modificar el último libro que leíste a parte de la indexación? (sin crear un nuevo objeto)
+
+<h3 style="color:green;">***</h3>
+
+## Módulo 1.1.2: Lenguaje básico II
+<h4 style="color:black;">For loops y funciones</h4>
+
+    
+Hasta el momento nos hemos remitido a tratar con variables estáticas (fijas, que no cambian) y además hemos utilizado funciones predefinidas en el rbase de R (conjunto de funciones predeterminadas). En esta sección realizaremos una introducción a el uso de **for loops** (cuando necesitamos automatizar un proceso ya sea en el tiempo, o bien para una lista o elementos de un vector) y a la escritura de **funciones**, ya que a veces podemos toparnos con que no existen las funciones que necesitamos y en lugar de perder horas buscando la función, quizás es más sencillo programarla uno mismo ;-). <br>
+
+* **For loops**
+
+Los **for loops** son instancias que nos permiten automatizar un proceso (y ahorrar mucho tiempo!!). Por ejemplo, si tenemos un vector al que a la mitad de los elementos queremos realizar cierta operación matemática, y otra operación a la mitad restante, en lugar de ir elemento por elemento basta con poner:
+``` {r 9, exercise=T, exercise.lines=7}
+vector_3<-seq(1,10,1)
+vector_3
+for (i in 1:5){
+    vector_3[i]<-vector_3[i]/10
+}
+for (i in 6:10){
+    vector_3[i]<-vector_3[i]/100
+}
+vector_3
+```
+De esta forma, como podemos ver, la estructura general de un **for loop** es:<br>
+`for (`*variable *`in`* range*`){` <br>
+    _do something_ <br>
+`}`<br>
+Donde la _variable_ creada es transitoria y **utilizada sólo dentro del loop**. en este caso esa variable puede indicar, entre otras cosas, la posición del elemento en el vector, o sólo un controlador temporal.<br>
+Otra forma es creando nuevos elementos, por así decirlo, independientes. Por ejemplo, en este caso _i_ toma valores entre 1 y 100 con un incremento de 0.1. Es decir, vamos actualizando el valor del objeto _i_ con cada paso temporal. El _for loop_ lo que hace en este caso es que cada vez que genera un número, lo muestra (o imprime) utilizando para esto la función `print()`:
+
+```{r 10, exercise=TRUE, exercise.lines=4}
+for (i in seq(1,100,0.01)){
+    print(i)
+}
+```
+* **Funciones**
+Hasta el momento sólo hemos utilizado funciones predefinidas en rbase, en esta breve introducción crearemos nuestras propias funciones ([learn more](http://www.dummies.com/programming/r/how-to-create-a-function-in-r/)).
+Cuando definimos la función, decidimos los argumentos que van ir dentro de esta función y que serán necesarios para que esta se ejecute. Por ejemplo, escribamos una función (llamada `switch`)para cambiar los valores de un vector binario dónde reemplazaremos los 0 por 1 y vice versa:
+
+```{r 11, exercise=T, exercise.lines=22}
+#Creamos el vector binario
+binario_1<-c(1,1,1,1,1,0,0,0,0,0)
+
+#Ahora definimos una funcion que llamaremos switch
+switch<-function(x){
+  for (n in 1:length(x)) {
+    if(x[n]==0) x[n] <- x[n] + 1 # if es un condicional, que quiere decir que si se cumple la condicion entre paréntesis se realice lo que le sigue al paréntesis
+    else x[n] <- x[n] - 1 # else indica que si no se cumple las condiciones anteriores se ejecute otra cosa
+  } 
+    return(x) #esto actualiza el vector binario_1
+}
+#Notar que esta funcion tiene sólo un argumento 'x', el cual corresponde al vector binario. 
+#Ademas notar que en la redacción de la funcion estamos sumando o restando 1, 
+#bien podriamos dejar solamente un 1 o un 0,respectivamente.
+
+# Antes de ejecutar la función llamaremos al vector original
+binario_1
+
+#Ahora ejecutamos la función y vemos el output
+switch(binario_1)
+```
+<h3 style="color:green;">***<br>Ejercicio bonus</h3>
+
+Imagina una población  de $N=$ 15 individuos, cada uno de los cuales puede estar sólo en un estado del espacio de estados posibles $\omega_i \in \Omega = \{0,1\}$. Dado el vector _initialState _ que define los estados iniciales en una población:<br>
+
+initialState<-c(0,0,0,0,0,0,0,1,0,0,0,0,0,0,0)<br>
+
+Podemos definir el estado de un individuo $i$ en un tiempo $(t)$ como $\omega_i(t)$. Nota que en este caso en subíndice $i$ indica la posición del individuo en el vector. <br>
+**Misión:** Crea una función llamada "spread" con dos argumentos: el vector inicial 'x' y un argumento asociado al número de generaciones a correr, la cual a cada paso temporal _seleccione aleatoriamente uno de los 15 individuos en el vector inicial_ (excepto los de los extremos), y que cambie el estado de este individuo $\omega_i(t) \rightarrow \omega_i(t+1)$ de acuerdo a las siguientes reglas:<br>
+
+*  Si $\omega_i(t) = 0$ y $\omega_{i-1}(t) = 1$ o $\omega_{i+1}(t) = 1$, entonces  $\omega_i(t+1) = 1$
+
+*  Si $\omega_i(t) = 0$ y $\omega_{i-1}(t) = \omega_{i+1}(t) = 0$, entonces  $\omega_i(t+1) = 0$ 
+
+*  Si $\omega_i(t) = 1$ y $\omega_{i-1}(t) = \omega_{i+1}(t) = 0$, entonces  $\omega_i(t+1) = 1$ 
+
+*  Si $\omega_i(t) = 1$ y $\omega_{i-1}(t) = 1$ o $\omega_{i+1}(t) = 1$, entonces  $\omega_i(t+1) = 0$
+
+
+<span style="background-color: cyan">Si lo logras, envía tu código dentro de las próximas 24hrs a spcastil@uc.cl y si está correcto obtendrás 0.5 puntos en el control!! (sólo para el primer estudiante que tenga el código correcto). May the force be w u ;-)</span>
+
+ <h3 style="color:green;">***</h3>
+
+## Módulo 1.2.1: Modelo exponencial
+
+En este módulo repasaremos y analizaremos conceptos centrales en el ámbito de la ecología de poblaciones, principalmente los principios de crecimiento exponencial (denso-independiente) y crecimiento logístico (denso-dependiente), así cómo las aproximaciones matemáticas (ecuaciones diferenciales y de diferencia) y sus implicancias biológicas. <br>
+
+En términos funcionales, de acuerdo a [Berryman (2002)](https://onlinelibrary.wiley.com/doi/pdf/10.1034/j.1600-0706.2002.970314.x) una población queda definida como:<br><br>
+_“a group of individuals of the same species that live together
+in an area of sufficient size to permit normal dispersal and/or
+migration behavior and in which numerical changes are largely
+determined by birth and death processes."_ <br><br>
+Por consiguente, la dinámica de poblaciones se centra en responder y generar preguntas relacionadas a los **cambios en el número de individuos** que experimenta una población.<br>
+
+###Modelo de crecimiento exponencial
+
+Siendo el modelo más sencillo de crecimiento poblacional, este modelo sólo cuenta con un parámetro que refleja la denso-independencia en el crecimiento de una población. La ecuación de diferencia corresponde a 
+$$\frac{\Delta N}{\Delta t}=\lambda$$ 
+tal que _N(t)_ corresponde al tamaño poblacional para un tiempo determinado, que depende solo del tamaño poblacional en el tiempo anterior _N(t-1)_ y la tasa de crecimiento $\lambda$. De forma análoga, la ecuación diferencial de este caso, corresponde a $$\frac{dN}{dt}=rN$$ En este módulo, nos ocuparemos de la primera aproximación, para ver la evolución de una población en el tiempo bajo este principio poblacional. <br>
+
+Antes de comenzar con la programación de este tipo de trayectorias poblacionales, analicemos de forma análitica la ecuación, busquemos sus puntos de equilibrio y su solución. <br>
+
+## 
+Ahora, veamos cómo podemos programarla y simular un comportamiento exponencial de una población.
+
+```{r 12, exercise=T, exercise.lines=22}
+# Inicialmente definiremos los parámetros fijos del modelo
+
+  N <- 10 # tamaño poblacional inicial
+  lambda <- 0.1 # tasa de crecimiento
+  nsteps <- 100 # numero de time steps a simular
+
+
+# Luego calculamos el cambio de la abundancia en el 'tiempo'. 
+# Notar que el tiempo avanza de forma discreta, saltos de una unidad temporal
+
+  for(t in 2:nsteps){
+ 
+    N[t] <- N[t-1] + N[t-1] * lambda
+    # N[t] = abundancia en el tiempo actual
+    # N[t-1] = abundancia en el tiempo anterior
+  }
+
+#A continuacion graficaremos los resultados
+plot(`N`, bty="n", las=1, type="l", lwd= 2,ylim=c(0, max(N)),
+       xlab="Tiempo", ylab="Tamaño Poblacional", main="Crecimiento Exponencial", col="blue")
+```
+
+
+<h3 style="color:green;"> ./?</h3>
+
+**Respecto a lo que sabemos hasta el momento, responde a las siguientes preguntas.**
+```{r quiz2, echo=FALSE}
+quiz(
+  question("¿Cuál(es) de los siguientes supuestos subyace(n) al modelo de crecimiento exponencial?",
+    answer("Tasas de mortalidad y natalidad dependen del tamaño poblacional"),
+    answer("Recursos ilimitados", correct = TRUE),
+    answer("No existe autoregulacion poblacional", correct = TRUE),
+    answer("Todos los individuos en una poblacion tienen igual probabilidad de morir", correct = T),
+    correct= "Bien, Malthus estaria orgulloso !",
+    incorrect = "Recuerda lo visto en clases e inténtalo otra vez ;)"
+  ), 
+ question("El modelo de crecimiento exponencial que hemos visto, es un modelo:",
+    answer("Denso-dependiente-espacialmente explícito"),
+    answer("Denso-independiente-espacialmente explícito"),
+    answer("Denso-dependiente-no es espacialmente explícito"),
+    answer("Denso-independiente-no es espacialmente explícito", correct = TRUE),
+    allow_retry = T,
+    correct= "Excelente !",
+    incorrect = "meh, no le diste. intentalo otra vez ;)"
+  )
+  
+)
+```
+
+## Módulo 1.2.2: Modelo logístico
+
+Este segundo modelo refleja el fenómeno de denso-dependencia en el crecimiento de una población (mecanismos de feedback o retroalimentación poblacional). En este caso abordaremos la aproximación en tiempo continuo y consideraremos que nuestra variable de interés es biomasa (una variable continua, diferenciable en el tiempo), siendo el modelo $$\frac{dN}{dt}=rN\times \Big(1 - \dfrac{N}{K}\Big)$$. Donde $r$ es la tasa per capita de crecimiento poblacional y $K$ es la capacidad de carga del sistema. Si buscamos las soluciones en el equilibrio (i.e., cuando $\dot{N}=0$) encontramos dos soluciones: la solución trivial $$\hat{N} = 0$$ y otra solución tal que $$\hat{N} = K$$.<br>
+
+¿ Cómo llegamos a estos resultados analíticos?
+##
+A continuación estudiaremos si esta aproximación analítica se corresponde con lo que podemos obtener a través de la simulación [determinista](https://es.wikipedia.org/wiki/Sistema_determinista) de una población.<br> Para ello utilizaremos dos paquetes de funciones nuevos, si estos no estan instalados en el computador que utilizas, corra el siguiente código en la consola de Rstudio: `install_packages(c("deSolve", "deTestSet"))`
+
+
+``` {r 14, exercise=T, exercise.lines=24}
+#Al igual que en el caso anterior, comenzaremos por definir la variables fijas 
+#(tambien llamadas 'globals')
+# Definimos los parámetros de crecimiento (fijos)
+r <- 0.4 ; K <- 10
+
+#Ademas necesitamos entregarle un vector inicial de poblacion (N0)
+N0 <- c(N = 2)
+
+#Definimos el intervalo de tiempo
+time <- seq(from = 0, to = 30, by = 0.2)
+
+#Creamos la funcion que describe el crecimiento logistico
+LogisticGrowth <- function(t, N, parameters){
+  r <- parameters[1]
+  K <- parameters[2]
+  dN <- r*N*(1 - N/K)
+  list(dN)
+}
+
+
+#Creamos una realizacion para determinada condicion inicial dada
+out_1 <- ode(y = N0, times = time, func = LogisticGrowth,
+           parms = c(r,K))
+
+#Graficamos el resultado
+plot(out_1, bty="n",main = "Crecimiento Logístico", lwd = 2, xlab = "Tiempo", ylab = "Densidad poblacional", col="blue")
+
+logistic.phasePortrait <- phasePortrait(logistic, y.lim = c(-0.5, max(out_1)), lwd = 2,
+                                        parameters = c(r,K), points = 10, col="purple", xlab="Tiempo", ylab="Función R")
+
+```
+
+```{r 15, exercise=T, exercise.lines=24}
+#Tambien podemos crear otras instancias para comparar con el caso anterior.
+#Por ejemplo cambiando la tasa de crecimiento
+##Caso A:
+N0 <- c(N = 2)
+r <- 0.5  ; K <- 10
+time <- seq(from = 0, to = 50, by = 0.2)
+
+out_2 <- deSolve::ode(y = N0, times = time, func = LogisticGrowth,
+           parms = c(r,K))
+
+##Caso B:
+N0 <- c(N = 2)
+r <- 0.25 ; K <- 10
+
+out_3 <- ode(y = N0, times = time, func = LogisticGrowth,
+           parms = c(r,K))
+
+#Y graficamos los resultados con el resultado anterior
+plot(out_2,out_3, bty="n",main = "Crecimiento Logístico", 
+     lwd = 2, xlab = "Tiempo", ylab = "Tamaño poblacional",col = c("green", "blue"))
+legend("bottomright",inset=0.05, c("Caso A", "Caso B"),cex=0.8, lty = c(1,2), col = c("green", "blue"))
+
+```
+
+<h3 style="color:green;">Quick coding task</h3>
+¿Qué crees que pasará si el tamaño poblacional inicial es mayor a la capacidad de carga? Evalúa el caso y grafica los resultados. Discute con respecto a si la capacidad de carga es un [atractor](https://en.wikipedia.org/wiki/Attractor) o un repulsor demográfico (**hint:**puntos de equilibrios estables/inestables).
+
+
+<h3 style="color:green;"> ./?</h3>
+
+**Respecto a lo que sabemos hasta el momento, responde a las siguientes preguntas.**
+
+```{r quiz3, echo=FALSE}
+quiz(
+  question("¿Cuál(es) de los siguientes supuestos subyace(n) al modelo de crecimiento logistico?",
+    answer("Es un modelo con denso-dependencia negativa", correct=T),
+    answer("Cambio instantaneo en $r$, dados cambios en $N(t)$", correct = F),
+    answer("Existen recursos limitados", correct = TRUE),
+    answer("$r_{max}$ y $K$ con constantes en el tiempo", correct = TRUE),
+    correct= "Muy bien !",
+    incorrect = "No le diste. Inténtalo otra vez ;)"
+  ), 
+ question("El modelo de crecimiento logistico  que hemos visto es un modelo",
+    answer("Denso-dependiente-espacialmente explícito"),
+    answer("Denso-independiente-espacialmente explícito"),
+    answer("Denso-dependiente-no es espacialmente explícito", correct = TRUE),
+    answer("Denso-independiente-no es espacialmente explícito"),
+    allow_retry = T,
+    correct= "Excelente !",
+    incorrect = "No le diste. Inténtalo otra vez ;)"
+  )
+  
+)
+```
