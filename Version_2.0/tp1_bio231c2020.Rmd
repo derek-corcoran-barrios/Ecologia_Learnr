@@ -65,6 +65,10 @@ list(dy)
 [Van der Meer y Goldberg (2013) Population Ecology: First principles](https://press.princeton.edu/titles/10164.html). <br>
 [Neuhauser (2014) Calculus for biology and medicine](https://www.amazon.com/Calculus-Biology-Medicine-Life-Sciences/dp/0321644689).
 
+Es recomendado que para el práctico tengas instalado r y rstudio, para eso puedes seguir el siguiente tutorial:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/RtkCAKXsVbw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 ---
 
