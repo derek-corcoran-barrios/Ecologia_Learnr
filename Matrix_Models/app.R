@@ -71,10 +71,6 @@ ui <- fluidPage(
             tabsetPanel(
                 tabPanel("Modelo",
                          plotOutput("distPlot"),
-                         fluidRow(
-                             column(2,tableOutput("Matrix")),
-                             column(6,tableOutput("Ns"), offset = 1)
-                         ),
                          uiOutput("Math")
                 ),
                 tabPanel("Projección",
@@ -198,6 +194,21 @@ server <- function(input, output) {
                 xlab="Clase de edad", ylab="Valor reproductivo", main="Valor reproductivo por clase")
     })
     
+    
+    output$Math <- renderUI({withMathJax(
+            helpText(paste("Formato de matriz
+               $$\\begin{bmatrix} N_1 \\\\ N_2 \\\\ N_3 \\\\ \\end{bmatrix} (t+1) = 
+            \\begin{bmatrix}
+        0 & 0 &", input$F3 ,"\\\\
+        ", input$P1,"& 0 & 0 \\\\
+        0 &", input$P2 ,"& 0 \\\\ \\end{bmatrix}", "\\begin{bmatrix}",
+                           input$N1 ,"\\\\", input$N2, "\\\\", input$N3 , "\\\\
+        \\end{bmatrix} (t)
+        $$")))
+        
+    })
+    
+    
     output$Elasticity <- renderPlot({
         
         proj.matrix <- Matrix()
@@ -233,7 +244,8 @@ server <- function(input, output) {
         
         ggplot(DF, aes(x = Etapa, y = Elasticidad)) + geom_col(aes(fill = Parametro), position = "dodge") +
             theme_bw()
-    }) 
+    })
+    
 }
 
 # Run the application 
