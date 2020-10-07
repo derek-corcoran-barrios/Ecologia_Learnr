@@ -1,0 +1,54 @@
+---
+title: "Modelos Matriciales e interacción de poblaciones"
+author: "Derek Corcoran"
+date: "10/7/2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+pacman::p_load(phaseR, deSolve, plotly, tidyverse, plotly, kableExtra, tidygraph, ggraph, igraph)
+```
+
+# Modelos Matriciales
+
+## Caso más simple: El salmón
+
+
+```{r, out.width="30%", fig.align='center'}
+DF <- data.frame(from = c(1,2,3,3), 
+                   to = c(2,3,3,1),  
+                   S = c(0.6, 0.1, 0, 0),
+                   Fe = c(0,0,0,3)) %>% 
+    mutate(Scaled_S = S/max(S),
+           Scaled_Fe = Fe/max(Fe))
+
+knitr::include_graphics("https://www.sciencemag.org/sites/default/files/styles/article_main_image_-_1280w__no_aspect_/public/salmon_16x9.jpg")
+```
+
+
+```{r}
+Graph <- graph_from_data_frame(DF)
+  
+    ggraph(Graph, layout = 'linear')+
+    geom_edge_link(aes(alpha = Scaled_S), color = "blue", arrow = arrow()) +
+    annotate(x = 1.5 , y= 0.052, geom = "text", label= DF$S[1])+
+    annotate(x = 2.5 , y= 0.052, geom = "text", label= DF$S[2])+
+    annotate(x = 2 , y= -0.7, geom = "text", label=DF$Fe[4])+
+    geom_edge_arc(aes(alpha = Scaled_Fe), color = "red", arrow = arrow()) +
+    geom_node_point(size = 4)  +
+    geom_node_label(aes(label = name)) +
+    ggraph::theme_graph() + ggraph::scale_edge_alpha_continuous(range =c(0,1), guide = "none")
+
+```
+
+## Otra diapo
+
+## Shiny
+
+
+
+```{r}
+knitr::include_app("https://admin.ecoinformatica.net/shiny/rstudio/sample-apps/Ecologia/Matriciales/", height = "100%")
+```
+

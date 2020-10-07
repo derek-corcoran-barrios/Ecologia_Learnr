@@ -279,7 +279,7 @@ e). ¿Que medidas de manejo deberíamos considerar para asegurar la viabilidad d
 
 El modelo de Lotka-Volterra describe la demografía de dos poblaciones interactuantes: una que es presa (N) y otra que es depredador (P). Además estas poblaciones cuentan con dinámicas demográficas intrínsecas. Las fluctuaciones temporales de la biomasa o densidad de estas poblaciones puede ser representada por:
 $$\dfrac{dN(t)}{dt} = \alpha N(t) - \beta N(t)P(t)$$
-$$\dfrac{dP(t)}{dt} = \delta N(t) P(t) - \gamma P(t)$$
+  $$\dfrac{dP(t)}{dt} = \delta N(t) P(t) - \gamma P(t)$$
 
 Los cambios demográficos de cada población en el tiempo (representados por la derivada) están dados por:
 Presa ($dN/dt$) Crecimiento exponencial representado a través del parámetro α. Se asume que todas los individuos tienen el mismo acceso a comida, misma condición de salud, etc. Es decir, una población no-estructurada. El segundo término $βN(t)P(t)$ da cuenta de la reducción poblacional en las presas producto de la caza por parte de los depredadores. Notar que este término depende únicamente de las densidades poblacionales de cada población interactuante y que es la única forma en que las presas mueren.<br>
