@@ -1,0 +1,329 @@
+---
+title: "Ecologia \n BIO231C_2020"
+author: "Simon P. Castillo - spcastil@uc.cl y Derek Corcoran - dacorcov@uc.cl"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+```{r setup, include=FALSE}
+#library(learnr)
+#require(phaseR)
+#require(deSolve)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(learnr, phaseR, deSolve, plotly, tidyverse)
+checkerb <- function(label, user_code, check_code, envir_result, evaluate_result, ...) { 
+
+  if (eval(parse(text=stringr::str_trim(gsub(" ","", user_code)))) == eval(parse(text=stringr::str_trim(gsub(" ","",check_code))))){
+    return(list(message = "Excelente! :D", correct = TRUE, location = "append"))}
+  else {return(list(message = paste0("Nope, sigue intentándolo!"), correct = FALSE, location = "append"))
+    }
+}
+
+tutorial_options(exercise.checker = checkerb)
+```
+## Módulos practicos Ecología BIO231C-2018
+**>Curso**: Ecología Bio231c <br>
+**>Profesor**: Pablo Marquet <br>
+**>Jefe de ayudantes**: Bárbara Seaman (b.seaman.e@gmail.com) <br>
+
+<h2 style="color:black;">Preámbulo</h2>
+<h3 style="color:blue;"> Contenidos</h3>
+---
+
+**Trabajo práctico #2 Introduccion al uso de matrices y poblaciones estructuradas** <br>
+
+2.1 Introducción al IDE Rstudio y uso de matrices<br>
+2.1.1 Lenguaje básico III: Matrices <br>
+2.1.2  Introduccion al IDE Rstudio y aspectos gráficos<br>
+2.2 Uso de matrices en poblaciones estructuradas <br>
+2.3 Modelos para poblaciones interactuantes: Depredador-presa
+
+
+ **Literatura de consulta**<br>
+[Van der Meer y Goldberg (2013) Population Ecology: First principles](https://press.princeton.edu/titles/10164.html). <br>
+[Neuhauser (2014) Calculus for biology and medicine](https://www.amazon.com/Calculus-Biology-Medicine-Life-Sciences/dp/0321644689).
+
+
+## Módulo 2.1: Lenguaje básico III: Matrices
+
+En esta sección aprenderemos algunas aproximaciones básicas al uso de matrices en R, conocimiento que luego utilizaremos para estudiar poblaciones estructuradas e interacciones ente poblaciones.
+En términos prácticos, una matriz es un caso particular de data frames o forma de organizar los datos en R. Las matrices son un conjunto de vectores numéricos (o en general, son vectores cuyos elementos son del mismo tipo). Veamos algunas operaciones básicas que comprenden el uso de matrices:
+
+
+```{r 1, exercise=TRUE, echo=FALSE, eval=TRUE}
+matrix0<-matrix(data = 0, nrow = 2, ncol = 2) ## Crea una matriz cuadrada con 4 valores = 0
+matrix0
+
+```
+
+También podemos crear matrices con valores aleatorios
+```{r 1_2, exercise=T, echo=FALSE}
+matrix1<-matrix(data=runif(25), nrow = 5, ncol = 5) ##Crea una matriz llamada "matrix1" de 5 x 5 llena de numeros aleatorios
+matrix1
+```
+O bien crear matrices juntando vectores de la misma longitud utilizando las funciones `cbind()` y `rbind()`. Notas alguna diferencia?
+```{r 1_2_1, exercise=TRUE}
+a<- 1:10
+b<-seq(0.5, 15, length.out = 10)
+c<- 11:20
+m1<-cbind(a,b,c)
+m2<-rbind(a,b,c)
+m1
+m2
+```
+Al igual que en el caso de los vectores o las listas, cuando utilizamos matrices podemeos indexar elementos de acuerdo a su posición
+```{r 1_3, exercise=T, echo=FALSE}
+# Indexa matrices utilizando []s
+# matrix[row index, column index]
+matrix1<-matrix(data=runif(25), nrow = 5, ncol = 5)
+matrix1
+#Podemos editar una columna completa de la matriz
+matrix1[,2]<-1
+
+#O un valor particular
+matrix1[1,3]<-8
+
+matrix1
+```
+
+Algunas funciones que se utilizan para el caso de poblaciones estructuradas son el cálculo de: el [determinante](https://es.wikipedia.org/wiki/Determinante_(matem%C3%A1tica)) de una matriz `det()`, la [inversa](https://es.wikipedia.org/wiki/Matriz_invertible) de la matriz `solve()`, la diagonal de la matriz obtenida con la funcion `diag()`, una multiplicación elemento a elemento entre una matriz y un vector `vector*matriz` , calcular un producto vectorial `vector%* %matriz` y por ultimo los autovalores y los autovectores utilizando la funcion `eigen()`.
+
+Recuerdas cuáles son las diferencias? Si no veamos un ejemplo con los distintos tipos de multiplicaciones.
+
+Multiplicacion elemento a elemento
+```{r 2, echo=FALSE, exercise=TRUE}
+vector1<- rep(c(0.1,0), 5)
+matrix_n<- matrix(data=seq(1,15, length.out = 15), nrow=3, ncol=5)
+vector1*matrix_n
+```
+
+Producto vectorial
+```{r 2_1, echo=FALSE, exercise=TRUE}
+vector1<- 1:5
+matrix_n<- matrix(data=seq(1:25), nrow=5, ncol=5)
+matrix_n
+vector1
+matrix_n%*%vector1
+```
+
+Difiere esto si modificamos el orden de la multiplicacion vectorial a `vector1%*%matrix_n`??
+
+## Modulo 2.2: poblaciones estructuradas
+
+En este módulo realizaremos el análisis que fue hecho por [Crouse y colaboradores (1987)](https://www.jstor.org/stable/1939225?seq=1#page_scan_tab_contents) en el que aplican un modelo matricial estructurado por edades para la conservación de la [tortuga boba](https://es.wikipedia.org/wiki/Caretta_caretta) _Caretta_ _caretta_.
+
+```{r 2_2, echo=FALSE, exercise=T}
+#Definición de parámetros del modelo
+
+# Cuántos años queremos simular?
+years<-50
+
+#Tenemos que crear un vector que contemple el tamaño poblacional inicial de las 7 clases de edades
+N0<-rep(10,7)
+
+#Construye la matriz de proyección. Correspondiente a la tabla 4 en Crouse et al.(1987).
+proj.matrix <- matrix(nrow=7, ncol=7, byrow=T, data=c(0, 0, 0, 0, 127, 4, 80,
+                                                      0.6747, 0.7370, 0, 0, 0, 0, 0,
+                                                      0, 0.0486, 0.6610, 0, 0, 0, 0,
+                                                      0, 0, 0.0147, 0.6907, 0, 0, 0,
+                                                      0, 0, 0, 0.0518, 0, 0, 0,
+                                                      0, 0, 0, 0, 0.8091, 0, 0,
+                                                      0, 0, 0, 0, 0, 0.8091, 0.8089))
+ #Qué debemos hacer?: 
+# Construir una matriz que vaya guardando los resultados del modelo para cada clase por año. 
+   #Una fila para cada año y una columna para cada clase.
+# Localizar el tamaño poblacional inicial en la primera fila (year 0)
+# Realiza el loop a través de los años, calculando para cada año la abundancia por edad 
+    # guardándola en la matriz de resultados
+result.matrix <-matrix(ncol = 7)
+result.matrix[1,]<-N0
+
+#Cómo estructurar el loop?
+
+# Paso 1. Obtener la abundancia del tiempo anterior
+# Step 2. Calcula la abundancia de este año multiplicando
+  # la matriz de proyección por el vector de abundancia a tiempo (t-1)
+# Step 3. Guarda el conteo de abundancia de este año, que será usado para la próxima iteración
+
+for (t in 2:years){
+    pop.year<- result.matrix[t-1,]%*%proj.matrix
+    result.matrix<-rbind(result.matrix, pop.year)
+}
+
+tot.pop<-rowSums(result.matrix)
+matrix_boba<-cbind(result.matrix,tot.pop)
+
+colnames(matrix_boba)<-c("stage1", "stage2", "stage3", "stage4","stage5", "stage6", "stage7", "tot.pop")
+rownames(matrix_boba)<-seq(1,years,1)
+
+head(matrix_boba, 20)
+
+#Graficar los resultados
+# Grafica en conteo total versus año
+df_bobo <- matrix_boba %>% as.data.frame() %>% mutate(t = dplyr::row_number()) %>% pivot_longer(-t, names_to = "Stage", values_to = "n")
+
+G <- ggplot(df_bobo, aes(x = t, y = n)) + geom_path(aes(color = Stage)) + theme_bw()
+
+ggplotly(G)
+```
+
+<h3 style="color:green;">Quick test</h3>
+
+a). ¿Cómo cambia el resultado si modificas el vector inicial de tamaños poblacionales?<br>
+b). O, ¿si cambias la ventana de tiempo?<br>
+c). Y ¿qué pasaría si se modifica la matriz de proyección? <br>
+
+### Estadísticas poblacionales
+A continuación calcularemos las estadísticas poblacionales que describen nuestra población de tortugas. Realizaremos el cálculo de las siguientes cantidades: tasa finita de crecimiento, distribución estable de edades, valores reproductivos edad-específicos, sensitividades y elasticidades.
+
+*Calcular la tasa finita de crecimiento*<br>
+
+La tasa finita de crecimiento ($λ$, o tasa asintótica de crecimiento) indica la dirección y magnitud del cambio poblacional <br>  
+$λ<1$ indica una población en decrecimiento ($r<0$) <br>  
+$λ>1$ indica una población en crecimiento ($r>0$) <br>
+
+$r=λ−1$, donde $r$ es la tasa intrínseca de crecimiento. <br>
+
+La tasa finita de crecimiento, $λ$, es equivalente al eigenvalor dominante de la matriz de proyección. El eigenvalor dominante ($λ1$) de cualquier matriz es el eigenvalor con el valor absoluto mayor. Para las matrices de proyección, $λ1$ siempre será positivo y real. <br>
+
+Calcular la estructura estable de edades (EEE) <br>
+
+La EEE es el eigenvector dominante de la matriz de proyección. El eigenvector dominante w está en la misma posición que el eigenvalor dominante λ1. Obtendremos w manteniendo la parte real, y dividiéndolo por la suma para obtener EEE. <br>
+
+Calcular el valor reproductivo <br>
+
+Los valores reproductivos entregan una medida de la importancia del individuo en cada clase de edad. Es la contribución esperada de cada individuo al crecimiento poblacional. Este es equivalente al eigenvector derecho, v, donde $v∗A=λ∗v$ donde $A $ es la matriz de proyección. Como la relación entre en eigenvector dominante (derecho) y EEE, este vector es proporcional a los valores reproductivos. <br>
+
+Calcular sensitividad y elasticidad <br>
+
+Sensitividad y elasticidad nos entregan información acerca de la importancia relativa de cada transición en la determinación de $λ$. La sensitividad de una matriz de proyección poblacional corresponde a las contribuciones directas de cada transición para determinar $λ$. Estas se derivan de la estructura estable de edades y del valor reproductivo. Elasticidades son la sensitividad pesada por las probabilidades de transición presentes en la matriz de proyección. Dos apectos interesantes de estas caracteristicas son: (1) transiciones que no son posibles tienen elasticidad igual a 0 y (2) las elasticidades suman 0, por lo que es sencillo comparar entre distintas matrices.
+
+```{r 3, echo=FALSE}
+# Siguiendo lo que dice Crouse et al. en "Population projections" (Pagina 1416)
+
+proj.matrix <- matrix(nrow=7, ncol=7, byrow=T, data=c(0, 0, 0, 0, 127, 4, 80,
+                                                      0.6747, 0.7370, 0, 0, 0, 0, 0,
+                                                      0, 0.0486, 0.6610, 0, 0, 0, 0,
+                                                      0, 0, 0.0147, 0.6907, 0, 0, 0,
+                                                      0, 0, 0, 0.0518, 0, 0, 0,
+                                                      0, 0, 0, 0, 0.8091, 0, 0,
+                                                      0, 0, 0, 0, 0, 0.8091, 0.8089))
+# Paso 1. Calcula los eigenvalues y eigenvectors para la matriz de proyección
+eigs <- eigen(proj.matrix)
+names(eigs)
+
+# Paso 2. Calcula la tasa finita de crecimiento (λ)
+dom.index <- which.max(eigs[["values"]])
+lambda <- Re(eigs[["values"]][dom.index])
+
+# Paso 3. Calcula la tasa intrínseca de crecimiento (r)
+r <- lambda - 1
+
+##################Estructura estable de edades###################
+
+# Paso 1. Calcular EEE
+w <- Re(eigs[["vectors"]][, dom.index])
+eee <- w / sum(w)
+round(eee, 3)
+
+# Step 2. Plot the stable stage distribution
+barplot(eee, las=1, names=1:7, 
+        main="Distribución Estable de Edades",
+        xlab="Clase de edades", ylab="Proporción relativa")
+
+##################Valor Reproductivo###################
+
+# Paso 1. Calcular el valor reproductivo
+m <- eigen(t(proj.matrix))
+v <- Re(m$vectors[, which.max(Re(m$values))])
+rv <- v/v[1]
+
+# Paso 2. Graficar el valor reproductivo
+barplot(rv, las=1, names=1:7,
+        xlab="Clase de edad", ylab="Valor reproductivo", main="Valor reproductivo por clase")
+
+##################Sensitividad y Elasticidad###################
+
+# Paso 1. Calcular sensitividad
+# (v y w los calculamos anteriormente)
+vw <- v %*% t(w)
+sens <- vw/as.numeric(v %*% w)
+
+# Paso 2. Calcular elasticidad
+# (lambda y sensitividad fueron calculadas anteriormente)
+elas <- (proj.matrix/lambda) * sens
+
+# PAso 3. Graficar elasticidad
+fs <- elas[1,]
+gs <- c(unlist(sapply(1:6, function(x) elas[x+1, x])),0)
+ps <- unlist(sapply(1:7, function(x) elas[x, x]))
+plot(1:10, 1:10, type="n", bty="n", las=1, 
+     xlim=c(1,7), ylim=c(0, 0.25), xlab="Clase de edad", ylab="Elasticidad")
+lines(fs, lwd=2, col="darkgreen")
+lines(gs, lwd=2, col="darkblue")
+lines(ps, lwd=2, col="darkred")
+legend("top", bty="n", lwd=2, col=c("darkgreen", "darkblue", "darkred"),
+              legend=c(expression("Fecundidad - F"["x"]), expression("Sobrevivencia - G"["x"]),
+                       expression("Sobrevivencia/Crecimiento - P"["x"])))
+```
+<h3 style="color:green;">Quick test</h3>
+
+a). ¿Qué significa la tasa finita de crecimiento para la población de tortugas bobas? <br>
+b). ¿Qué piensas que la EEE dice con respecto a la población de tortugas bobas? <br>
+c). ¿Qué significan los valores reproductivos para esta población? <br>
+d). ¿Qué significan estos valores de elasticidad para la población de tortugas bobas? <br>
+e). ¿Que medidas de manejo deberíamos considerar para asegurar la viabilidad de la población?
+
+
+
+## Modulo 2.3: interacciones entre poblaciones
+
+El modelo de Lotka-Volterra describe la demografía de dos poblaciones interactuantes: una que es presa (N) y otra que es depredador (P). Además estas poblaciones cuentan con dinámicas demográficas intrínsecas. Las fluctuaciones temporales de la biomasa o densidad de estas poblaciones puede ser representada por:
+$$\dfrac{dN(t)}{dt} = \alpha N(t) - \beta N(t)P(t)$$
+$$\dfrac{dP(t)}{dt} = \delta N(t) P(t) - \gamma P(t)$$
+
+Los cambios demográficos de cada población en el tiempo (representados por la derivada) están dados por:
+Presa ($dN/dt$) Crecimiento exponencial representado a través del parámetro α. Se asume que todas los individuos tienen el mismo acceso a comida, misma condición de salud, etc. Es decir, una población no-estructurada. El segundo término $βN(t)P(t)$ da cuenta de la reducción poblacional en las presas producto de la caza por parte de los depredadores. Notar que este término depende únicamente de las densidades poblacionales de cada población interactuante y que es la única forma en que las presas mueren.<br>
+Depredador ($dP/dt$) Acá existe limitación en el crecimiento dado por el encuentro con las presas y la razón de consumo y asimilación ($δ$). Y por otro lado, la muerte de estos ocurre de forma exponencial con una tasa $γ$.
+
+```{r 3_2, exercise=T, echo=FALSE}
+lotkaVolterra <-function(t, y, parameters) {
+x <- y[1]
+y <- y[2]
+alpha <- parameters[1]
+beta <- parameters[2]
+delta <- parameters[3]
+gamma <- parameters[4]
+dy <- numeric(2)
+dy[1] <- alpha*x - beta*x*y
+dy[2] <- delta*x*y - gamma*y
+list(dy)
+}
+ 
+Parameters <- c(alpha = 2, beta = 2.5, delta = 2.3, gamma= 2)
+Pop <- c(x = 2, y = 4) 
+Time <- seq(0, 50, by = 1)
+ 
+out <- as.data.frame(ode(func = lotkaVolterra, y = Pop, parms = Parameters, times = Time))
+ 
+matplot(out[,-1], type = "l", xlab = "Tiempo", ylab = "Densidad poblacional",col = c("red", "blue"))
+legend("topright",inset=0.05, c("Cute bunnies", "Hungry foxes"),cex=0.8, lty = c(1,1), col = c("red", "blue"))
+
+head(out, n = 10)
+```
+
+```{r 3_3, exercise=TRUE, echo=FALSE}
+Parameters <- c(alpha = 2, beta = 2.5, delta = 2.3, gamma= 2)
+x.lim<-c(-1,10)
+y.lim=c(-1,10)
+lotkaVolterra.flowField <-flowField(lotkaVolterra, xlim = x.lim, ylim = y.lim,
+parameters = Parameters, points = 19, add = FALSE,xlab = "Cute bunnies (N)", ylab ="Hungry foxes (P)" )
+
+lotkaVolterra.nullclines <-nullclines(lotkaVolterra, xlim = x.lim, ylim = y.lim,
+parameters = Parameters, points = 500, col=c("red", "blue"), add.legend = F)
+
+#Simulamos una matriz con 3 tamaños poblacionales iniciales distintos para N y P
+y0 <- matrix(c(2,4), ncol = 2, nrow = 1)
+lotkaVolterra.trajectory <-trajectory(lotkaVolterra, y0 = y0, tlim =  c(0,10),
+                                      parameters = Parameters, col = rep("black", 3))
+legend("topright",inset=0.05, c("Cute bunnies", "Hungry foxes"),cex=0.8, lty = c(1,1), col = c("red", "blue"),title = "Nullclines")
+```
