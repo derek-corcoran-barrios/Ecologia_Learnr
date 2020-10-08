@@ -244,8 +244,8 @@ server <- function(input, output) {
                                                    points = 19)   
         }
         
-        #y0 <- matrix(c(input$N1, input$N2), ncol = 2, nrow = 1, byrow = TRUE)
-        #lotkaVolterra.trajectory <- trajectory(lotkaVolterra, y0 = y0, tlim = c(0,input$Tiempos),parameters = c(input$Lambda, input$Epsilon, input$Delta, input$Gamma), col = rep("black", 1))
+        y0 <- matrix(c(input$Spp1, input$Spp2), ncol = 2, nrow = 1, byrow = TRUE)
+        Comp.trajectory <- trajectory(competition, y0 = y0, tlim = c(0,input$Tiempos),parameters = c(input$r1, input$K1, input$Alpha1, input$r2, input$K2, input$Alpha2), col = rep("black", 1))
     })
 }
 
