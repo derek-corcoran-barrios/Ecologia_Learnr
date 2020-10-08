@@ -1,8 +1,11 @@
 ---
 title: "Modelos Matriciales e interacción de poblaciones"
 author: "Derek Corcoran"
-date: "10/7/2020"
-output: ioslides_presentation
+date: "`r format(Sys.time(), '%d/%m, %Y')`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    incremental: true
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +17,7 @@ pacman::p_load(phaseR, deSolve, plotly, tidyverse, plotly, kableExtra, tidygraph
 
 ## Caso más simple: El salmón
 
-
+i
 ```{r, out.width="30%", fig.align='center'}
 DF <- data.frame(from = c(1,2,3,3), 
                    to = c(2,3,3,1),  
@@ -42,13 +45,94 @@ Graph <- graph_from_data_frame(DF)
 
 ```
 
-## Otra diapo
 
-## Shiny
-
-
+## Entendamos bien esto
 
 ```{r}
 knitr::include_app("https://admin.ecoinformatica.net/shiny/rstudio/sample-apps/Ecologia/Matriciales/", height = "100%")
 ```
 
+## Desde tabla de vida
+
+```{r, out.width="80%", fig.align='center'}
+knitr::include_graphics("LifeTable.png")
+```
+
+
+## Algunos parámetros
+
+* $\lambda$ = tasa de crecimiento (Eigenvalor dominante)
+* Estructura de edad estable (Eigenvector izquierdo) 
+* Valor reproductivo por edad (Eigenvector derecho) 
+
+
+## Ciclos más complejos
+
+```{r, out.width="80%", fig.align='center'}
+knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Life-cycle_graphs_%28matrix_population_models%29.pdf/page1-1200px-Life-cycle_graphs_%28matrix_population_models%29.pdf.jpg")
+```
+
+## Ciclos más complejos
+
+```{r, out.width="80%", fig.align='center'}
+knitr::include_graphics("https://kevintshoemaker.github.io/NRES-470/gotelli3_6.jpg")
+```
+
+## Elasticidad
+
+* que parte del ciclo influencia más $\lambda$
+
+# por que es importante?
+
+## Ejemplo 1 sobrepoblación
+
+<iframe src="https://ourworldindata.org/grapher/world-population-by-world-regions-post-1820" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>
+
+## Grupos de edades estables
+
+<iframe src="https://ourworldindata.org/grapher/population-by-broad-age-group?tab=chart&stackMode=relative&country=~CHL&region=World" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>
+
+## Fertilidad por edad
+
+<iframe src="https://ourworldindata.org/grapher/children-per-woman-UN?tab=chart&time=1950..latest&country=~OWID_WRL&region=World" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>
+
+## Mortalidad infantil
+
+<iframe src="https://ourworldindata.org/grapher/Children-woman-death-vs-survival?country=~CHL" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>
+
+## Ejemplo 2 conservación (Tortugas marinas)
+
+```{r, out.width="80%", fig.align='center'}
+knitr::include_graphics("https://storage.googleapis.com/afs-prod/media/67627c7a9db3486a9330158dbdcfc4de/3000.jpeg")
+```
+
+## Fuentes de mortalidad
+
+```{r, out.width="40%", fig.align='center'}
+knitr::include_graphics("https://rs.projects-abroad.net/v1/hero/product-5c9a0a9462d0e.[1600].jpeg")
+```
+
+
+```{r, out.width="40%", fig.align='center'}
+knitr::include_graphics("https://nationswell.com/wp-content/uploads/2019/08/Aryfahmed_turtlelede.jpg")
+```
+
+## Que es lo mejor
+
+[ver tutorial](https://www.ecoinformatica.net/Modulo2.html)
+
+* Learnr para aprender a hacer estos análisis en R
+* Descubrir en que parte de la población hay que intervenir
+
+
+# Depredador presa
+
+## Ejemplo
+
+```{r}
+knitr::include_app("https://admin.ecoinformatica.net/shiny/rstudio/sample-apps/Ecologia/Matriciales/", height = "100%")
+```
+
+## seguir en la actividad anterior
+
+* [ver tutorial](https://www.ecoinformatica.net/Modulo2.html)
